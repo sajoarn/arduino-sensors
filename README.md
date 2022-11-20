@@ -12,6 +12,5 @@ Uses a rudimentary task loop system with three tasks:
 * Digital Temperature read task - Uses A0 (as a Digital for 9600 baud serial via OneWire library), 5V and GND
 * Seven Segment Display task - uses 34611BS-1 four digit seven segment display on D2 through D13 with 1kOhm current limiters on the four digit control pins
 
-![Bread board image front](./SevenSegmentTemperature/Pictures/PXL_20221120_205236549.jpg "Bread board image front")
+![Bread board image top](./SevenSegmentTemperature/Pictures/Breadboard_top.jpg "Bread board image top")
 
-![Bread board image back](./SevenSegmentTemperature/Pictures/PXL_20221120_205249119.jpg "Bread board image back")
