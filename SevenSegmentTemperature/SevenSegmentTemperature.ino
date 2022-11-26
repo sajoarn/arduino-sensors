@@ -105,7 +105,7 @@ void setup() {
     pinMode(A0, OUTPUT);
     //Use A1 as digital for heartbeat LED
     pinMode(A1, OUTPUT);
-    Serial.begin(9600); //A0 9600 baud serial out
+    Serial.begin(9600); //Debug 9600 baud serial out
 }
 
 //loop repeated once per tick
