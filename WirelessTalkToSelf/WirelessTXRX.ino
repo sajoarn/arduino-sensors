@@ -16,7 +16,8 @@
 RH_ASK rf_driver(TX_RX_BIT_RATE, PIN_RECEIVE, PIN_TRANSMIT, PIN_TX_CONTROLLER, PTT_INVERTED);
 
 // Set buffer to size of expected message
-uint8_t buf[11];
+#define BUFF_SIZE 32
+uint8_t buf[BUFF_SIZE];
 uint8_t buflen = sizeof(buf);
 bool firstloop = true;
 
@@ -51,23 +52,32 @@ void WirelessRXMsg()
   //DEBUG:
     if(firstloop)
     {
-      String debug = "buff contains ";
+      String debugLine1 = "buff contains ";
+      // String debugLine2 = "buff length: " + &buflen;
 
       for(uint8_t i = 0; i < 11; ++i)
       {
-          debug += buf[i];
-          debug += " ";
+          debugLine1 += buf[i];
+          debugLine1 += " ";
       }
-      Serial.println(debug);
+      
+
+      Serial.println(debugLine1);
+      // Serial.println(debugLine2);
       firstloop = false;
     }
     
     // Check if received packet is correct size
-    if (rf_driver.recv(buf, &buflen))
+    rf_driver.recv(buf, &buflen);
+    if(buf[0] != 0)
     {
-      
-      // Message received with valid checksum
-      Serial.print("Message Received: ");
-      Serial.println((char*)buf);         
+      Serial.println((char*)buf);
     }
+    // if (rf_driver.recv(buf, &buflen))
+    // {
+      
+    //   // Message received with valid checksum
+    //   Serial.print("Message Received: ");
+    //   Serial.println((char*)buf);         
+    // }
 }

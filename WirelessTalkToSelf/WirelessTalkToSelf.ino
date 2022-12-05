@@ -67,7 +67,7 @@ void task_WirelessMsgTX()
 void task_WirelessMsgRX()
 {
   WirelessRXMsg();
-  // Serial.println("WirlesMsgTX");
+  // Serial.println("WirlesMsgRX");
 }
 
 void task_GetTemperature(currentTemperPass pass, unsigned long currentTime)
@@ -171,7 +171,7 @@ void loop() {
 
   if(currentMillis >= taskCounterMsgRX + TASK_WIRLESS_MSG_TX)
   {
-    // task_WirelessMsgRX();
+    task_WirelessMsgRX();
 
     taskCounterMsgRX = currentMillis;
   }
