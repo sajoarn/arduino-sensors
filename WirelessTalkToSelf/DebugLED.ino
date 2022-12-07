@@ -4,7 +4,7 @@ int ledState = LOW;
 
 void setupDebugLED()
 {
-    pinMode(PIN_DEBUG_LED, A1);
+    pinMode(PIN_DEBUG_LED, OUTPUT);
 }
 
 void setDebugLED(bool on)

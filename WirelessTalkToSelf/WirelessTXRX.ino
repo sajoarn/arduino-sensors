@@ -3,7 +3,7 @@
 // Include RadioHead Amplitude Shift Keying Library
 #include <RH_ASK.h>
 // Include dependant SPI Library 
-#include <SPI.h> 
+#include <SPI.h> //not actually used but needed to compile
 
 #define PIN_TRANSMIT A0
 #define PIN_RECEIVE A3
@@ -16,7 +16,7 @@
 RH_ASK rf_driver(TX_RX_BIT_RATE, PIN_RECEIVE, PIN_TRANSMIT, PIN_TX_CONTROLLER, PTT_INVERTED);
 
 // Set buffer to size of expected message
-#define BUFF_SIZE 32
+#define BUFF_SIZE RH_ASK_MAX_MESSAGE_LEN
 uint8_t buf[BUFF_SIZE];
 uint8_t buflen = sizeof(buf);
 bool firstloop = true;
@@ -24,7 +24,8 @@ bool firstloop = true;
 void WirelessTXRXSetup()
 {
     // Initialize ASK Object
-    rf_driver.init();
+    if(!rf_driver.init())
+      Serial.println("RF Driver Init Failed");
 
     pinMode(PIN_TRANSMIT, OUTPUT);
     pinMode(PIN_RECEIVE, INPUT);
@@ -38,8 +39,10 @@ void WirelessTXMsg()
 {
     DebugLEDOn();
     const char *msg = "Hello World";
-    rf_driver.send((uint8_t *)msg, strlen(msg));
-    rf_driver.waitPacketSent();
+    if(!rf_driver.send((uint8_t *)msg, strlen(msg)))
+      Serial.println("Packet Send Failed");
+    if(!rf_driver.waitPacketSent()) //wait for TX to finish and become available again
+      Serial.println("WaitPacketSent Failed");
     DebugLEDOff();
 }
 
@@ -55,7 +58,7 @@ void WirelessRXMsg()
       String debugLine1 = "buff contains ";
       // String debugLine2 = "buff length: " + &buflen;
 
-      for(uint8_t i = 0; i < 11; ++i)
+      for(uint8_t i = 0; i < BUFF_SIZE; ++i)
       {
           debugLine1 += buf[i];
           debugLine1 += " ";
@@ -68,11 +71,22 @@ void WirelessRXMsg()
     }
     
     // Check if received packet is correct size
-    rf_driver.recv(buf, &buflen);
-    if(buf[0] != 0)
+    // rf_driver.recv(buf, &buflen);
+    // if(buf[0] != 0)
+    // {
+    //   Serial.println((char*)buf);
+    // }
+
+    if (rf_driver.recv(buf, &buflen)) // Non-blocking
     {
-      Serial.println((char*)buf);
+	    int i;
+
+	    // Message with a good checksum received, dump it.
+	    rf_driver.printBuffer("Got:", buf, buflen);
     }
+
+
+    
     // if (rf_driver.recv(buf, &buflen))
     // {
       

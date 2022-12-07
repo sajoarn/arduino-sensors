@@ -121,13 +121,14 @@ void task_GetTemperature(currentTemperPass pass, unsigned long currentTime)
 //setup runs once
 void setup() {
 
+    Serial.begin(9600); //9600 baud serial out
+    
     WirelessTXRXSetup();
     setupDebugLED();
     setupDS1820TemperatureSensor();
 
     // pinMode(DS1820_DATA_PIN, OUTPUT);
     pinMode(HEARTBEAT_LED_PIN, OUTPUT);
-    Serial.begin(9600); //9600 baud serial out
 }
 
 //loop repeated once per tick
