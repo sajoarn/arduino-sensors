@@ -36,6 +36,7 @@ void loop()
     uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
     uint8_t buflen = sizeof(buf);
 
+    // Clear out garbage in buffer
     for(uint8_t i = 0; i < RH_ASK_MAX_MESSAGE_LEN; ++i)
     {
         buf[i] = 0;
@@ -44,7 +45,7 @@ void loop()
     if (driver.recv(buf, &buflen)) // Non-blocking
     {
 	    // Message with a good checksum received, dump it.
-    	driver.printBuffer("Got:", buf, buflen); 
+    	// driver.printBuffer("Got:", buf, buflen); 
       Serial.println((char*)buf);
     }
 }

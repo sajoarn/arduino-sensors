@@ -10,10 +10,14 @@
 #include <SPI.h> // Not actually used but needed to compile
 #endif
 
+#include <string.h>
+
 RH_ASK driver;
-// RH_ASK driver(2000, 4, 5, 0); // ESP8266 or ESP32: do not use pin 11 or 2
-// RH_ASK driver(2000, 3, 4, 0); // ATTiny, RX on D3 (pin 2 on attiny85) TX on D4 (pin 3 on attiny85), 
-// RH_ASK driver(2000, PD14, PD13, 0); STM32F4 Discovery: see tx and rx on Orange and Red LEDS
+
+// Temperature Sensor:
+#include "SparkFunHTU21D.h"
+//Create an instance of the object for HTU21D
+HTU21D TempAndHumid;
 
 void setup()
 {
@@ -22,13 +26,25 @@ void setup()
 
   if (!driver.init())
     Serial.println("init failed");
+
+  TempAndHumid.begin();
 }
 
 void loop()
 {
-    const char *msg = "hello";
+  float humd = TempAndHumid.readHumidity();
+  float temp = TempAndHumid.readTemperature();  
 
-    driver.send((uint8_t *)msg, strlen(msg));
-    driver.waitPacketSent();
-    delay(200);
+  char buf[RH_ASK_MAX_MESSAGE_LEN];
+  dtostrf(temp, 5, 1, buf); //strip down float to important digits and convert to char array
+  String str = String(buf); //convert temperature char array to string to concatenate later
+  dtostrf(humd, 4, 1, buf); //strip down float
+  str = str + "," + String(buf); //concatenate temperature and relative humidity to send in message  
+  str.toCharArray(buf, sizeof(buf)); //put finished string back in buffer to send over message
+  Serial.println((char*)buf);
+
+  // Transmit message
+  driver.send((char*)buf, sizeof(buf));
+  driver.waitPacketSent();
+  delay(1000);
 }
