@@ -46,5 +46,5 @@ void loop()
   // Transmit message
   driver.send((char*)buf, sizeof(buf));
   driver.waitPacketSent();
-  delay(1000);
+  delay(10000);
 }
