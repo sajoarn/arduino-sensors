@@ -46,6 +46,6 @@ void loop()
     {
 	    // Message with a good checksum received, dump it.
     	// driver.printBuffer("Got:", buf, buflen); 
-      Serial.println((char*)buf);
+      // Serial.println((char*)buf);
     }
 }

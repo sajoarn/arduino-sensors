@@ -19,6 +19,20 @@ RH_ASK driver;
 //Create an instance of the object for HTU21D
 HTU21D TempAndHumid;
 
+enum msgBytes 
+{
+  TempNegative, //1 if negative, 0 if positive
+  TempHundreds,
+  TempTens,
+  TempOnes,
+  TempTenths,
+  RHHundreds,
+  RHTens,
+  RHOnes,
+  RHTenths,
+  MAX_NUM_MSG_BYTES
+};
+
 void setup()
 {
   Serial.begin(9600);	  // Debugging only
@@ -32,8 +46,46 @@ void setup()
 
 void loop()
 {
-  float humd = TempAndHumid.readHumidity();
   float temp = TempAndHumid.readTemperature();  
+  float humd = TempAndHumid.readHumidity();
+
+  uint8_t msgBuf[MAX_NUM_MSG_BYTES];
+
+  for(uint8_t i = 0; i < MAX_NUM_MSG_BYTES; ++i)
+  {
+    msgBuf[i] = 0;
+  }
+
+  ////////////////// Temperature Bits
+  //Watch the implicit and explicit type conversions here; abs() outputs an (int)
+  msgBuf[TempNegative] = (uint8_t)(temp < 0);
+  int absTemp = abs(temp);
+  msgBuf[TempHundreds] = (uint8_t)((absTemp / 100) % 10);
+  msgBuf[TempTens] = (uint8_t)((absTemp/10) % 10);
+  msgBuf[TempOnes] = (uint8_t)((absTemp) % 10);
+  float tenthsStep1 =   temp / 0.1; //need to separate this step out, otherwise it will be off by 0.1
+  msgBuf[TempTenths] = (uint8_t)((abs(tenthsStep1)) % 10);
+
+  ////////////////// RH Bits
+  int intRH = (int)humd;
+  msgBuf[RHHundreds] = (uint8_t)((intRH / 100) % 10);
+  msgBuf[RHTens] = (uint8_t)((intRH/10) % 10);
+  msgBuf[RHOnes] = (uint8_t)((intRH) % 10);
+  tenthsStep1 = humd / 0.1; //need to separate this step out, otherwise it will be off by 0.1
+  msgBuf[RHTenths] = (uint8_t)(((int)(tenthsStep1)) % 10);
+  
+  for(uint8_t i = 0; i < MAX_NUM_MSG_BYTES; ++i)
+  {
+    Serial.println(msgBuf[i]);
+  }
+
+  delay(10000);
+}
+
+void sendTempRHString()
+{
+  float temp = TempAndHumid.readTemperature();  
+  float humd = TempAndHumid.readHumidity();
 
   char buf[RH_ASK_MAX_MESSAGE_LEN];
   dtostrf(temp, 5, 1, buf); //strip down float to important digits and convert to char array
@@ -45,6 +97,5 @@ void loop()
 
   // Transmit message
   driver.send((char*)buf, sizeof(buf));
-  driver.waitPacketSent();
-  delay(10000);
+  driver.waitPacketSent();  
 }
