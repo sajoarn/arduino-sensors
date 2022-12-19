@@ -16,6 +16,20 @@ RH_ASK driver;
 // RH_ASK driver(2000, 3, 4, 0); // ATTiny, RX on D3 (pin 2 on attiny85) TX on D4 (pin 3 on attiny85), 
 // RH_ASK driver(2000, PD14, PD13, 0); STM32F4 Discovery: see tx and rx on Orange and Red LEDS
 
+enum msgBytes 
+{
+  TempNegative, //1 if negative, 0 if positive
+  TempHundreds,
+  TempTens,
+  TempOnes,
+  TempTenths,
+  RHHundreds,
+  RHTens,
+  RHOnes,
+  RHTenths,
+  MAX_NUM_MSG_BYTES
+};
+
 void setup()
 {
 #ifdef RH_HAVE_SERIAL
@@ -28,6 +42,7 @@ void setup()
 	;
 #endif
 
+  Serial.println("433MHz RX Init");
   Serial.println("433MHz RX Init");
 }
 
@@ -45,7 +60,7 @@ void loop()
     if (driver.recv(buf, &buflen)) // Non-blocking
     {
 	    // Message with a good checksum received, dump it.
-    	// driver.printBuffer("Got:", buf, buflen); 
+    	driver.printBuffer("Got:", buf, buflen); 
       // Serial.println((char*)buf);
     }
 }

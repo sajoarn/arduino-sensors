@@ -73,11 +73,11 @@ void loop()
   msgBuf[RHOnes] = (uint8_t)((intRH) % 10);
   tenthsStep1 = humd / 0.1; //need to separate this step out, otherwise it will be off by 0.1
   msgBuf[RHTenths] = (uint8_t)(((int)(tenthsStep1)) % 10);
-  
-  for(uint8_t i = 0; i < MAX_NUM_MSG_BYTES; ++i)
-  {
-    Serial.println(msgBuf[i]);
-  }
+    
+  // Transmit message
+  driver.printBuffer("MsgBuf: ", msgBuf, sizeof(msgBuf));
+  driver.send((char*)msgBuf, sizeof(msgBuf));
+  driver.waitPacketSent();  
 
   delay(10000);
 }
